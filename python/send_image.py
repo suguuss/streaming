@@ -1,7 +1,7 @@
 from PIL import Image
 from scapy.all import *
 import cv2
-
+from time import time
 
 def pixel_to_byte(pixel):
 	r, g, b = pixel
@@ -30,21 +30,24 @@ def send(data):
 	p = Ether(dst=MAC_DST, type=0) / (data)
 	sendp(p, iface=conf.ifaces.dev_from_index(INTERFACE_ID), count=SEND_COUNT, verbose=False)
 
+
+
+# Test image
 img = Image.open("test_image.jpg").convert("RGB")
-# # im = img.resize((192, 108))
 im = img.resize((320, 180))
 pixels = list(im.getdata())
 
-# black 	= [(0,0,0)]  * len(pixels)
-# blue 	= [(0,0,255)]  * len(pixels)
-# green 	= [(255,0,0), (0,255,0), (0,0,255)]  * (len(pixels)//3)
-# red 	= [(255,0,0)]  * len(pixels)
-# white 	= [(255,255,255)]  * len(pixels)
-# pixels = green
 
-# print(green[:10])
+PIXELS_PER_PACKET = 500
+
+cam = cv2.VideoCapture(0)
 
 while True:
+
+	st = time()
+
+	# Image from camera
+	
 	# s, img = cam.read()
 	# if not s: continue
 
@@ -52,14 +55,14 @@ while True:
 	# im = img.resize((320, 180))
 	# pixels = list(im.getdata())
 
-	for x in range(0, len(pixels), 50):
-		data = list_pxl_to_bytestr(pixels[x:x+50])
-		if len(data) < 150:
-			data += b"\x00" * (150 - len(data))
+	for x in range(0, len(pixels), PIXELS_PER_PACKET):
+		data = list_pxl_to_bytestr(pixels[x:x+PIXELS_PER_PACKET])
+		if len(data) < PIXELS_PER_PACKET*3:
+			data += b"\x00" * (PIXELS_PER_PACKET*3 - len(data))
 
-		# print(x / 50 + 1)
-		# print(pixels[x:x+50])
 		send(data)
 
 	# 	break
-	break
+
+	t = time() - st
+	print(f"took {t:.3f} ms | {1/t:.2f} fps", end="\r")

@@ -160,51 +160,44 @@ begin
 
 	signal_gen: process(pixel_clk)
 	begin
-		if rising_edge(pixel_clk) then
-			if rst_n = '0' then
-				h_px_count <= 0;
-				v_px_count <= 0;
-				h_addr <= 0;
-				v_addr <= 0;
-			else
-				if v_act = '1' and h_act = '1' then
-					de <= '1';
-					
-					if h_px_count = 5 then
-						h_px_count <= 0;
-						h_addr <= h_addr + 1;
-					else
-						h_px_count <= h_px_count + 1;
-					end if;
-
+		if falling_edge(pixel_clk) then
+			if v_act = '1' and h_act = '1' then
+				de <= '1';
+				
+				if h_px_count = 5 then
+					h_px_count <= 0;
+					h_addr <= h_addr + 1;
 				else
-					de <= '0';
-				end if;
-					
-				if h_max = '1' and v_act = '1' then
-					if v_px_count = 5 then
-						v_px_count <= 0;
-						v_addr <= v_addr + 1;
-					else
-						v_px_count <= v_px_count + 1;
-					end if;
+					h_px_count <= h_px_count + 1;
 				end if;
 
-				if v_max = '1' then
-					v_addr <= 0;
-				end if;
-
-				if h_max = '1' then
-					h_addr <= 0;
-				end if;
-
-				ram_addr <= std_logic_vector(to_unsigned(v_addr * 320 + h_addr, addr'length));
-				
-				
-				r <= ram_data(17 downto 12) & b"00";
-				g <= ram_data(11 downto 6) & b"00";
-				b <= ram_data(5 downto 0) & b"00";
+			else
+				de <= '0';
 			end if;
+				
+			if h_max = '1' and v_act = '1' then
+				if v_px_count = 5 then
+					v_px_count <= 0;
+					v_addr <= v_addr + 1;
+				else
+					v_px_count <= v_px_count + 1;
+				end if;
+			end if;
+
+			if v_max = '1' then
+				v_addr <= 0;
+			end if;
+
+			if h_max = '1' then
+				h_addr <= 0;
+			end if;
+
+			ram_addr <= std_logic_vector(to_unsigned(v_addr * 320 + h_addr, addr'length));
+			
+			
+			r <= ram_data(17 downto 12) & b"00";
+			g <= ram_data(11 downto 6) & b"00";
+			b <= ram_data(5 downto 0) & b"00";
 
 		end if;
 	end process;
