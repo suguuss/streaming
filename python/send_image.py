@@ -40,7 +40,7 @@ pixels = list(im.getdata())
 
 PIXELS_PER_PACKET = 500
 
-cam = cv2.VideoCapture(0)
+cam = cv2.VideoCapture(1)
 
 while True:
 
@@ -48,12 +48,12 @@ while True:
 
 	# Image from camera
 	
-	# s, img = cam.read()
-	# if not s: continue
+	s, img = cam.read()
+	if not s: continue
 
-	# img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-	# im = img.resize((320, 180))
-	# pixels = list(im.getdata())
+	img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+	im = img.resize((320, 180))
+	pixels = list(im.getdata())
 
 	for x in range(0, len(pixels), PIXELS_PER_PACKET):
 		data = list_pxl_to_bytestr(pixels[x:x+PIXELS_PER_PACKET])

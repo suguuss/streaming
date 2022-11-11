@@ -1,6 +1,7 @@
 *
 !streaming.vhdl
 !.gitignore
+!streaming_result.gif
 !python
 !python/**
 !src
